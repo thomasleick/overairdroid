@@ -1,12 +1,8 @@
-#!/usr/bin/env python
-
 """
 OverAirdroid
-
 An unofficial API script to make automating Airdroid functions easier.
-
 Created by Matthew Bryant
-
+Working with Python 3, md5 import working by Thomas Leick
 """
 import datetime
 import requests
@@ -14,16 +10,14 @@ import base64
 import urllib
 import time
 import json
-import md5
+from hashlib import md5
 import sys
 from bs4 import BeautifulSoup
 
 class overairdroid:
     """
     Converts the callback Javascript to a dict of the JSON
-
     @input_json Inputted JSON packed in Airdroid callback stuff
-
     return  Returns a dict of inputted Airdroid Javascript
     """
     def air2json( self, input_json ):
@@ -35,19 +29,16 @@ class overairdroid:
 
     """
     Make viewing trees a lot easier
-
     @input_dict The input dictionary for viewing
-
     return None
     """
     def pprint( self, input_dict):
-        print json.dumps(input_dict, sort_keys=True, indent=4, separators=(',', ': '))
+        print(json.dumps(input_dict, sort_keys=True, indent=4, separators=(',', ': ')))
 
     """
     Initialize all of the needed variables
-
     @inut_dict  The input dict with all of our needed values
-    
+
     return None
     """
     def initialize_variables( self, input_dict ):
@@ -69,19 +60,17 @@ class overairdroid:
 
     def statusmsg( self, input_string ):
         if self.verbose:
-            print "[ STATUS ] " + input_string
+            print("[ STATUS ] " + input_string)
 
     def errormsg( self, input_string ):
         if self.verbose:
-            print "[ ERROR ] " + input_string
+            print("[ ERROR ] " + input_string)
 
     """
     Initialize the OverTheAirdroid object
-
     @in_username    The Airdroid username
     @in_password    The Airdroid password
     @in_verbose     Should the program be verbose?
-
     return None
     """
     def __init__(self, in_username, in_password, in_verbose = True):
@@ -132,13 +121,13 @@ class overairdroid:
         self.storage_size_free = ""
         self.wifi_name = ""
         self.wifi_bars = ""
-    
+
         # Attempt a log in
         self.is_loggedin = self.login()
 
     """
     Login to Airdroid
-    
+
     return  True on success and False on failure
     """
     def login( self ):
@@ -167,7 +156,6 @@ class overairdroid:
 
     """
     Wakeup the Android device if an action hasn't been preformed in a while
-
     return  True on success and False on failure
     """
     def wakeup( self ):
@@ -191,7 +179,6 @@ class overairdroid:
 
     """
     Get the "bb" value needed to preform Airdroid actions
-
     return  String of bb value
     """
     def get_bb( self ):
@@ -216,9 +203,8 @@ class overairdroid:
 
     """
     Open URL on Android device
-    
-    @url    String of the URL to open
 
+    @url    String of the URL to open
     return  None
     """
     def url_open( self, url ):
@@ -233,7 +219,7 @@ class overairdroid:
         }
 
         r = self.s.get('http://' + self.phone_ip + ':' + self.phone_port + '/sdctl/comm/openurl/', params=get_data)
-   
+
     """
     Why is this still here?
     """
@@ -273,9 +259,7 @@ class overairdroid:
 
     """
     Set the Android clipboard
-
     @data   Data to set the clipboard to
-
     return  True on success and False on failure
     """
     def set_clipboard( self, data ):
@@ -283,13 +267,13 @@ class overairdroid:
         unix_time = str( int( time.mktime(n.timetuple()) ) )
 
         layer_data = {
-            "content": base64.b64encode( data ) 
+            "content": base64.b64encode( data )
         }
 
         post_data = {
             "content": urllib.quote_plus( json.dumps( layer_data ) ),
         }
-    
+
         r = self.s.post('http://' + self.phone_ip + ':' + self.phone_port + '/sdctl/comm/clipboard/set?7bb=' + self.var_7bb, data=post_data)
 
         result = json.loads( r.text )
@@ -298,10 +282,9 @@ class overairdroid:
             return True
         else:
             return False
-    
+
     """
     Get the Android device's clipboard
-
     return  The clipboard contents
     """
     def get_clipboard( self ):
@@ -325,10 +308,8 @@ class overairdroid:
 
     """
     Send an SMS from Android phone
-
     @phone_number   Integer of the phone number to send the SMS to
     @message        String of the SMS message to be sent
-
     return True on success and False on failure
     """
     def sms( self, phone_number, message ):
@@ -340,10 +321,10 @@ class overairdroid:
             "number": phone_number,
             "content": str( message ),
             "threadId": unix_time,
-        } 
+        }
 
         layer2 = {
-            "content": base64.b64encode( urllib.quote_plus( urllib.quote_plus( json.dumps( layer1 ) ) ) ), 
+            "content": base64.b64encode( urllib.quote_plus( urllib.quote_plus( json.dumps( layer1 ) ) ) ),
         }
 
         post_data = {
@@ -358,4 +339,3 @@ class overairdroid:
         else:
             self.errormsg( "Error sending SMS!" )
             return False
-
